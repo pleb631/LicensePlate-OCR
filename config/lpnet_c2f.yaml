@@ -1,0 +1,84 @@
+# pytorch_lightning==1.8.1
+seed_everything: 1676910911
+trainer:
+  logger:
+    - class_path: pytorch_lightning.loggers.TensorBoardLogger
+      init_args:
+        save_dir: lightning_logs
+        name: lpnet_c2f
+
+  enable_checkpointing: true
+  callbacks:
+    - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+      init_args:
+        filename: 'epoch{epoch:03d}-loss{val/loss:.6f}-acc{val/acc:.4f}'
+        auto_insert_metric_name: false
+        save_top_k: 10
+        save_last: true
+        monitor: 'val/loss'
+        mode: 'min'
+  devices: 2
+  check_val_every_n_epoch: 1
+  max_epochs: 100
+  log_every_n_steps: 50
+  accelerator: 'gpu'
+  precision: 16-mixed
+model:
+  optimizer:
+    class_path: lprec.pl_model.Optimizer
+    init_args:
+      class_path: optim.Adam
+      kwargs:
+        weight_decay: 1.e-6
+        lr: 0.0005
+  lr_scheduler:
+    class_path: lprec.pl_model.Optimizer
+    init_args:
+      class_path: optim.lr_scheduler.MultiStepLR
+      kwargs:
+        milestones: [60,90]
+        gamma: 0.1
+  
+  num_classes: 66
+  dropout: 0.4
+  blank: 0
+  model_type: LPRNet_c2f
+  se: true
+  use_ohem: true
+  th: 0.05
+data:
+  train_datasets:
+    - class_path: lprec.datasets.MXRecordIODataset
+      init_args:
+        idx_path: dataset/CRPD/CRPD.idx
+        rec_path: dataset/CRPD/CRPD.rec
+        training: true
+
+    - class_path: lprec.datasets.MXRecordIODataset
+      init_args:
+        idx_path: dataset/CCPD/CCPD.idx
+        rec_path: dataset/CCPD/CCPD.rec
+        training: true
+        
+
+
+
+  train_batch_size: 256
+  train_num_workers: 8
+  val_datasets:  
+    - class_path: lprec.datasets.MXRecordIODataset
+      init_args:
+        idx_path: dataset/CBLPRD/CBLPRD.idx
+        rec_path: dataset/CBLPRD/CBLPRD.rec
+
+
+  test_datasets:
+    - class_path: lprec.datasets.MXRecordIODataset
+      init_args:
+        idx_path: dataset/CBLPRD/CBLPRD.idx
+        rec_path: dataset/CBLPRD/CBLPRD.rec
+
+
+
+  test_batch_size: 1
+  test_num_workers: 0

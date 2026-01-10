@@ -1,0 +1,17 @@
+albumentations==1.3.1
+onnx==1.14.0
+onnx-simplifier==0.4.35
+onnxruntime-gpu==1.16.1
+opencv-python==4.7.0.72
+timm
+torch==2.1.0
+torchvision==0.16.0
+pytorch-lightning==2.0.3
+mxnet==1.9.1
+numpy==1.26.0
+jsonargparse[signatures]>=4.17.0
+tensorboardX
+tensorboard
+matplotlib
+# python==3.11.0
+# lprnet/lib/python3.11/site-packages/mxnet/numpy/utils.py 中第37行要改为bool = onp.bool_
